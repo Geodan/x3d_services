@@ -56,8 +56,8 @@ app.get( '/bgt3d', function( req, res ) {
 		}
 		else {
 			var client = new pg.Client( { 
-					user : 'geodan', 
-					password : 'Gehijm', 
+					user : 'postgres', 
+					password : 'xxxxxxx', 
 					database : 'research', 
 					host : 'metis', 
 					port : 5432 
