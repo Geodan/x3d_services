@@ -7,7 +7,7 @@ pointcloud_unclassified AS(
 		PC_FilterEquals(pa,'classification',1)
 	 pa  
 	FROM ahn3_pointcloud.vw_ahn3, bounds 
-	WHERE ST_DWithin(geom, Geometry(pa),10) --patches should be INSIDE bounds
+	WHERE ST_DWithin(geom, PC_Envelope(pa),10) --patches should be INSIDE bounds
 ),
 patches AS (
 	SELECT a.pa FROM pointcloud_unclassified a

@@ -32,12 +32,12 @@ tunnels AS (
 pointcloud_ground AS (
 	SELECT PC_FilterEquals(pa,'classification',2) pa 
 	FROM ahn3_pointcloud.vw_ahn3, bounds
-	WHERE ST_Intersects(geom, Geometry(pa))
+	WHERE PC_Intersects(geom, pa)
 	--Sometimes roads are incorrectly classified as bridges, so also include bridge points 
 	/*UNION ALL
 	SELECT PC_FilterEquals(pa,'classification',26) pa 
 	FROM ahn3_pointcloud.vw_ahn3, bounds
-	WHERE ST_Intersects(geom, Geometry(pa))*/
+	WHERE PC_Intersects(geom, pa)*/
 ),
 polygons AS (
 	SELECT nextval('counter') id, ogc_fid fid, type, class,(ST_Dump(geom)).geom
@@ -53,7 +53,7 @@ polygons AS (
 	SELECT id, fid, type, class, patch_to_geom(PC_Union(b.pa), geom) geom
 	FROM polygons a 
 	LEFT JOIN pointcloud_ground b
-	ON ST_Intersects(geom,Geometry(b.pa))
+	ON PC_Intersects(geom,b.pa)
 	WHERE ST_GeometryType(geom) = 'ST_Polygon'
 	GROUP BY id, fid, type, class, geom
 )

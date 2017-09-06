@@ -6,17 +6,21 @@ var app = express( );
 var fs = require( 'fs' ); 
 var pg = require( 'pg' ); 
 var sets = {
-	buildings: { file: '../sql/citydb_buildings.sql',sql: ''},
-	faces: { file: '../sql/citydb_faces.sql',sql: ''},
-	contours: { file: '../sql/noise_contours.sql',sql: ''}
-	
+	roofplanes: { file: '../sql/noise_roofplanes.sql',sql: ''},
+	buildup: { file : '../sql/noise_buildup.sql',sql: ''},
+	water: { file: '../sql/bgt_water.sql',sql: ''},
+	terrain: { file : '../sql/bgt_terrain.sql',sql: ''},
+	roads: { file : '../sql/bgt_road.sql',sql: ''},
+	treepoints: { file : '../sql/ahn3_treepoints.sql', sql : '' },
+	buildingpoints: { file : '../sql/ahn3_buildingpoints.sql', sql : '' },
+	kade: { file: '../sql/bgt_kade.sql',sql: ''}
 }; 
 for( var s in sets ) { 
 	sets [ s ].sql = fs.readFileSync( sets [ s ].file ).toString( ); 
 };
 app.use( cors( )); 
 app.use(compress());  
-app.get( '/citydb', function( req, res ) { 
+app.get( '/noisemodel3d', function( req, res ) { 
 		var north = req.query [ 'north' ]; 
 		var south = req.query [ 'south' ]; 
 		var west = req.query [ 'west' ]; 
@@ -36,9 +40,10 @@ app.get( '/citydb', function( req, res ) {
 		else {
 			var client = new pg.Client( { 
 					user : 'postgres', 
-					database : '3dcitydb', 
+					password : 'xxxxxxx', 
+					database : 'research', 
 					host : 'metis', 
-					port : 5432 
+					port : 5433 
 			} ); 
 			
 			var querystring = fs.readFileSync( sets [ set ].file ).toString( );
@@ -88,6 +93,6 @@ app.get( '/citydb', function( req, res ) {
 app.get( '/', function( req, res ) { 
 		res.send( 'Nothing to see here, move on!' ); 
 } );
-app.listen( 8082, function( ) { 
-		console.log( 'CityDB X3D service listening on port 8082' ); 
+app.listen( 8081, function( ) { 
+		console.log( 'BGT X3D service listening on port 8081' ); 
 } ); 

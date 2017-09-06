@@ -5,7 +5,7 @@ bounds AS (
 pointcloud_water AS (
 	SELECT PC_FilterEquals(pa,'classification',9) pa 
 	FROM ahn3_pointcloud.vw_ahn3, bounds 
-	WHERE ST_Intersects(geom, Geometry(pa)) --patches should be INSIDE bounds
+	WHERE PC_Intersects(geom, pa) --patches should be INSIDE bounds
 ),
 polygons AS (
 	SELECT nextval('counter') id, bgt_type as type, 'water'::text AS class,
@@ -30,9 +30,9 @@ polygons AS (
 	) geom
 	FROM polygons a
 	LEFT JOIN ahn3_pointcloud.vw_ahn3 b
-	ON ST_Intersects(
+	ON PC_Intersects(
 		a.geom,
-		geometry(pa)
+		pa
 	)
 	GROUP BY a.id, a.type, a.class, a.geom
 )

@@ -10,7 +10,7 @@ bounds AS (
 ,pointcloud_ground AS (
 	SELECT PC_FilterEquals(pa,'classification',2) pa --ground points 
 	FROM ahn3_pointcloud.vw_ahn3, bounds 
-	WHERE ST_DWithin(geom, Geometry(pa),10)
+	WHERE ST_DWithin(geom, PC_Envelope(pa),10)
 ),
 polygons AS (
 	SELECT nextval('counter') id, ogc_fid fid, COALESCE(type,'transitie') as type, class,(ST_Dump(geom)).geom
@@ -20,7 +20,7 @@ polygons AS (
 	SELECT id, fid, type, class, patch_to_geom(PC_Union(b.pa), geom) geom
 	FROM polygons a 
 	LEFT JOIN pointcloud_ground b
-	ON ST_Intersects(geom,Geometry(b.pa))
+	ON PC_Intersects(geom,b.pa)
 	GROUP BY id, fid, type, class, geom
 )
 ,triangles AS (

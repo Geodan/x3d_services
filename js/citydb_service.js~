@@ -6,10 +6,9 @@ var app = express( );
 var fs = require( 'fs' ); 
 var pg = require( 'pg' ); 
 var sets = {
-	buildings: { file: '../sql/citydb_buildings.sql',sql: ''},
-	faces: { file: '../sql/citydb_faces.sql',sql: ''},
-	contours: { file: '../sql/noise_contours.sql',sql: ''}
-	
+	buildings: { file: 'citydb_buildings.sql',sql: ''},
+	faces: { file: 'citydb_faces.sql',sql: ''},
+	contours: { file: 'noise_contours.sql',sql: ''}
 }; 
 for( var s in sets ) { 
 	sets [ s ].sql = fs.readFileSync( sets [ s ].file ).toString( ); 

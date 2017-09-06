@@ -9,7 +9,7 @@ pointcloud_building AS (
 			'NumberOfReturns',1),
 		'Intensity',150) pa  --take out trees with nreturns ands intensity
 	FROM ahn3_pointcloud.vw_ahn3, bounds 
-	WHERE ST_DWithin(geom, Geometry(pa),10) --patches should be INSIDE bounds
+	WHERE ST_DWithin(geom, PC_Envelope(pa),10) --patches should be INSIDE bounds
 ),
 footprints AS (
 	SELECT a.ogc_fid id, a.ogc_fid, 'border' AS class, a.bgt_type as type, 
@@ -24,24 +24,17 @@ footprints AS (
 	AND ST_Intersects(a.wkb_geometry, c.geom)
 	AND ST_Intersects(ST_Centroid(a.wkb_geometry), c.geom)
 )
-,papoints AS ( --get points from intersecting patches
-	SELECT 
-		a.id,
-		PC_Explode(b.pa) pt,
-		geom footprint
-	FROM footprints a
-	LEFT JOIN pointcloud_building b ON (ST_Intersects(a.geom, geometry(b.pa)))
-),
-papatch AS (
+,papatch AS (
 	SELECT
 		a.id, PC_PatchMin(PC_Union(pa), 'z') min
 	FROM footprints a
-	LEFT JOIN pointcloud_building b ON (ST_Intersects(a.geom, geometry(b.pa)))
+	LEFT JOIN pointcloud_building b ON (PC_Intersects(a.geom, b.pa))
 	GROUP BY a.id
 ),
 footprintpatch AS ( --get only points that fall inside building, patch them
-	SELECT id, PC_Patch(pt) pa, footprint
-	FROM papoints WHERE ST_Intersects(footprint, Geometry(pt))
+	SELECT id, PC_Intersection(PC_Union(pa),geom) pa, geom as footprint
+	FROM footprints a
+	LEFT JOIN pointcloud_building b ON PC_Intersects(a.geom, b.pa)
 	GROUP BY id, footprint
 ),
 stats AS (
@@ -58,7 +51,7 @@ stats_fast AS (
 		footprints.id,
 		geom footprint
 	FROM footprints 
-	LEFT JOIN pointcloud_building ON (ST_Intersects(geom, geometry(pa)))
+	LEFT JOIN pointcloud_building ON (PC_Intersects(geom, pa))
 	GROUP BY footprints.id, footprint
 ),
 polygons AS (

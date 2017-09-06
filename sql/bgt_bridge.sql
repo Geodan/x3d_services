@@ -5,7 +5,7 @@ bounds AS (
 pointcloud AS (
 	SELECT PC_FilterEquals(pa,'classification',26) pa --bridge points 
 	FROM ahn3_pointcloud.vw_ahn3, bounds 
-	WHERE ST_DWithin(geom, Geometry(pa),10) --patches should be INSIDE bounds
+	WHERE ST_DWithin(geom, PC_Envelope(pa),10) --patches should be INSIDE bounds
 ),
 --TODO: introduce extra vertices where brdge pilon intersects
 footprints AS (
@@ -51,14 +51,14 @@ footprints AS (
 	PC_Explode(COALESCE(b.pa, --if not intersection, then get the closest one 
 		(
 		SELECT b.pa FROM pointcloud b
-		ORDER BY a.geom <#> Geometry(b.pa) 
+		ORDER BY a.geom <#> PC_Envelope(b.pa) 
 		LIMIT 1
 		)
 	)) pt
 	FROM edge_points a LEFT JOIN pointcloud b
-	ON ST_Intersects(
+	ON PC_Intersects(
 		a.geom,
-		geometry(pa)
+		pa
 	)
 ),
 emptyz AS ( 
@@ -112,17 +112,17 @@ polygonsz AS (
 ,patches AS (
 	SELECT t.id, pa
 	FROM pointcloud, terrain_polygons t
-	WHERE ST_Intersects(
+	WHERE PC_Intersects(
 		geom,
-		geometry(pa)
+		pa
 	)
 ),
 all_points AS ( -- get pts in every boundary
 	SELECT t.id, geometry(PC_Explode(pa)) geom 
 	FROM pointcloud, terrain_polygons t
-	WHERE ST_Intersects(
+	WHERE PC_Intersects(
 		geom,
-		geometry(pa)
+		pa
 	)
 ),
 innerpoints AS (

@@ -5,7 +5,7 @@ bounds AS (
 pointcloud_unclassified AS (
 	SELECT PC_FilterEquals(pa,'classification',26) pa --unclassified points 
 	FROM ahn3_pointcloud.vw_ahn3, bounds 
-	WHERE ST_DWithin(geom, Geometry(pa),10) --patches should be INSIDE bounds
+	WHERE ST_DWithin(geom, PC_Envelope(pa),10) --patches should be INSIDE bounds
 ),
 footprints AS (
 	SELECT ST_Force3D(ST_SetSrid(ST_CurveToLine(a.wkb_geometry),28992)) geom,
@@ -23,7 +23,7 @@ papoints AS ( --get points from intersecting patches
 		PC_Explode(b.pa) pt,
 		geom
 	FROM footprints a
-	LEFT JOIN pointcloud_unclassified b ON (ST_Intersects(a.geom, geometry(b.pa)))
+	LEFT JOIN pointcloud_unclassified b ON PC_Intersects(a.geom, b.pa)
 ),
 papatch AS (
 	SELECT

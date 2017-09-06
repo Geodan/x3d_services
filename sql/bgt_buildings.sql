@@ -6,7 +6,7 @@ bounds AS (
 pointcloud AS (
 	SELECT PC_FilterEquals(pa,'classification',6) pa 
 	FROM ahn3_pointcloud.vw_ahn3, bounds 
-	WHERE ST_DWithin(geom, Geometry(pa),10) --patches should be INSIDE bounds
+	WHERE ST_DWithin(geom, PC_EnvelopeGeometry(pa),10) --patches should be INSIDE bounds
 ),
 footprints AS (
 	SELECT ST_Force3D(ST_GeometryN(ST_SimplifyPreserveTopology(wkb_geometry,0.4),1)) geom,
@@ -20,24 +20,16 @@ footprints AS (
 	AND ST_Intersects(ST_Centroid(a.wkb_geometry), b.geom)
 	AND ST_IsValid(a.wkb_geometry)
 ),
-papoints AS ( --get points from intersecting patches
-	SELECT 
-		a.id,
-		PC_Explode(b.pa) pt,
-		geom footprint
-	FROM footprints a
-	LEFT JOIN pointcloud b ON (ST_Intersects(a.geom, geometry(b.pa)))
-),
 stats_fast AS (
 	SELECT 
-		PC_PatchAvg(PC_Union(pa),'z') AS max,
-		PC_PatchMin(PC_Union(pa),'z') AS min,
+		PC_PatchAvg(PC_Intersection(PC_Union(pa),geom),'z') AS max,
+		PC_PatchMin(PC_Intersection(PC_Union(pa),geom),'z') AS min,
 		footprints.id,
 		bouwjaar,
 		geom footprint
 	FROM footprints 
 	--LEFT JOIN ahn_pointcloud.ahn2objects ON (ST_Intersects(geom, geometry(pa)))
-	LEFT JOIN pointcloud ON (ST_Intersects(geom, geometry(pa)))
+	LEFT JOIN pointcloud ON (PC_Intersects(geom, pa))
 	GROUP BY footprints.id, footprint, bouwjaar
 ),
 polygons AS (

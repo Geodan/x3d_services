@@ -24,13 +24,15 @@ var sets = {
 	treepoints_ahn2: { file : '../sql/bgt_ahn2_treepoints.sql', sql : '' },
 	groundpoints: { file: '../sql/bgt_groundpoints.sql', sql: '' },
 	lights: { file : '../sql/bgt_lights.sql', sql : '' },
+	bgtnoise: { file : '../sql/bgt_noisemodel.sql',sql: ''},
 	adam3dfied_BuildingPart: { file : '../sql/adam3dfied_BuildingPart.sql', sql : '' },
 	adam3dfied_Waterdeel: { file : '../sql/adam3dfied_Waterdeel.sql', sql : '' },
 	adam3dfied_OnbegroeidTerreindeel: { file : '../sql/adam3dfied_OnbegroeidTerreindeel.sql', sql : '' },
 	adam3dfied_TrafficArea: { file : '../sql/adam3dfied_TrafficArea.sql', sql : '' },
 	adam3dfied_PlantCover: { file : '../sql/adam3dfied_PlantCover.sql', sql : '' },
 	adam3dfied_Scheiding: { file : '../sql/adam3dfied_Scheiding.sql', sql : '' },
-	adam3dfied_BridgeConstructionElement: { file : '../sql/adam3dfied_BridgeConstructionElement.sql', sql : '' }
+	adam3dfied_BridgeConstructionElement: { file : '../sql/adam3dfied_BridgeConstructionElement.sql', sql : '' },
+	breaklines: { file: '../sql/noise_breaklines.sql',sql: ''}
 }; 
 for( var s in sets ) { 
 	sets [ s ].sql = fs.readFileSync( sets [ s ].file ).toString( ); 
@@ -60,7 +62,7 @@ app.get( '/bgt3d', function( req, res ) {
 					password : 'xxxxxxx', 
 					database : 'research', 
 					host : 'metis', 
-					port : 5432 
+					port : 5433 
 			} ); 
 			
 			var querystring = fs.readFileSync( sets [ set ].file ).toString( );
