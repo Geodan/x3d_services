@@ -7,12 +7,14 @@ var fs = require( 'fs' );
 var pg = require( 'pg' ); 
 var sets = {
 	roofplanes: { file: '../sql/noise_roofplanes.sql',sql: ''},
+	roofoutline: { file: '../sql/noise_roofoutline.sql',sql: ''},
 	buildup: { file : '../sql/noise_buildup.sql',sql: ''},
 	water: { file: '../sql/bgt_water.sql',sql: ''},
 	terrain: { file : '../sql/bgt_terrain.sql',sql: ''},
 	roads: { file : '../sql/bgt_road.sql',sql: ''},
 	treepoints: { file : '../sql/ahn3_treepoints.sql', sql : '' },
 	buildingpoints: { file : '../sql/ahn3_buildingpoints.sql', sql : '' },
+	buildings: { file : '../sql/bgt_buildings.sql', sql : '' },
 	kade: { file: '../sql/bgt_kade.sql',sql: ''}
 }; 
 for( var s in sets ) { 

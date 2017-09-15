@@ -6,7 +6,7 @@ pointcloud_unclassified AS(
 	SELECT 
 		PC_FilterEquals(pa,'classification',6)
 	 pa  
-	FROM tmp.roofpatches, bounds 
+	FROM noisemodel.roofpatches, bounds 
 	WHERE ST_DWithin(geom, PC_Envelope(pa),10) --patches should be INSIDE bounds
 ),
 patches AS (

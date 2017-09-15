@@ -2,39 +2,53 @@ WITH
 bounds AS (
 	SELECT ST_Segmentize(ST_MakeEnvelope(_west, _south, _east, _north, 28992),_segmentlength) geom
 )
-,exclusion_zone AS (
-	SELECT ST_Union(wkb_geometry) as geom 
-	FROM bgt.overbruggingsdeel_2dactueelbestaand a, bounds b
-	WHERE ST_Intersects(a.wkb_geometry, b.geom)
+,breakpolys AS (
+	SELECT 
+	
+	ST_MakePolygon(
+			ST_ExteriorRing(
+				(ST_Dump(ST_Triangulate2DZ(ST_Collect(ST_Force3D(wkb_geometry))))).geom
+			)
+		) geom
+		
+		
+	FROM noisemodel.breaklines_chopped a, bounds b 
 )
-,collections AS (
-	SELECT ST_Buffer(ST_Union(ST_Buffer(a.geom, 10)),-9) geom
-	FROM bagagn_201704.gebouwen a, bounds b, exclusion_zone c
-	WHERE ST_Contains(b.geom,a.geom)
-	AND ST_Disjoint(c.geom, a.geom)
-	AND gebw_type = 'p'
-)
-,dump AS (
-	SELECT (ST_Dump(a.geom)).geom geom 
-	FROM collections a
+,breaklines AS (
+	SELECT 
+	
+		
+		ST_Force3D(wkb_geometry) as geom
+	FROM noisemodel.breaklines_chopped a, bounds b 
 ),
-polyz AS (
-	SELECT patch_to_geom(PC_Union(PC_FilterEquals(pa,'classification',2)), geom) geom
-	FROM ahn3_pointcloud.vw_ahn3, dump
-	WHERE PC_Intersects(ST_ExteriorRing(geom), pa)
-	GROUP BY geom
+water as (
+	SELECT ST_Buffer(ST_Union(wkb_geometry),1) as wkb_geometry
+	FROM bgt.waterdeel_2dactueelbestaand, bounds
+	WHERE ST_Intersects(wkb_geometry,geom)
 )
-
---SELECT (ST_Dump(ST_Intersection(ST_ConCaveHull(a.geom,0.999), b.geom))).geom geom
---FROM polyz a, bounds b
+,cutwater AS (
+	SELECT a.geom 
+	FROM breaklines a
+	LEFT JOIN water b ON (St_Contains(b.wkb_geometry, a.geom))
+	WHERE b.wkb_geometry Is Null
+	
+)
 
 
 SELECT _south::text || _west::text || 'X' AS id, 
-'buildup' As type,
-'buildup' As class,
-'red' as color,
-ST_AsX3D(ST_Extrude((geom), 0,0,-1)) geom
-FROM polyz p
+'breakline' As type,
+'breakline' As class,
+'0 1 0' as color,
+ST_AsX3D(ST_Translate(geom,0,0,-0.5)) geom
+FROM breaklines p
+WHERE geom Is Not Null
+UNION ALL
+SELECT _south::text || _west::text || 'X' AS id, 
+'breakline' As type,
+'breakline' As class,
+'1 0.3 0.3' as color,
+ST_AsX3D(ST_Translate(geom,0,0,-0.5)) geom
+FROM breakpolys p
 WHERE geom Is Not Null
 --GROUP BY fid, p.type,p.class
 ;
