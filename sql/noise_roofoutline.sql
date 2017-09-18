@@ -16,4 +16,5 @@ SELECT _south::text || _west::text || p.gebwbagid AS id,
 'red' as color,
 ST_AsX3D(ST_Collect(geom)) geom
 FROM buildings p
-WHERE geom Is Not Null;
+WHERE geom Is Not Null
+GROUP BY p.gebwbagid;

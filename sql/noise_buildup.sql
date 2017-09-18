@@ -13,25 +13,26 @@ bounds AS (
 		
 		
 	FROM noisemodel.breaklines_chopped a, bounds b 
+	WHERE ST_Intersects(wkb_geometry, geom)
 )
 ,breaklines AS (
 	SELECT 
-	
-		
 		ST_Force3D(wkb_geometry) as geom
 	FROM noisemodel.breaklines_chopped a, bounds b 
+	WHERE ST_Intersects(wkb_geometry, geom)
 ),
 water as (
 	SELECT ST_Buffer(ST_Union(wkb_geometry),1) as wkb_geometry
 	FROM bgt.waterdeel_2dactueelbestaand, bounds
 	WHERE ST_Intersects(wkb_geometry,geom)
+	
 )
 ,cutwater AS (
 	SELECT a.geom 
 	FROM breaklines a
 	LEFT JOIN water b ON (St_Contains(b.wkb_geometry, a.geom))
 	WHERE b.wkb_geometry Is Null
-	
+
 )
 
 
