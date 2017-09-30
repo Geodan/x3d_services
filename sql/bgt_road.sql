@@ -1,14 +1,18 @@
 
 WITH
 bounds AS (
-	SELECT ST_Segmentize(ST_MakeEnvelope(_west, _south, _east, _north, 28992),_segmentlength) geom
+	SELECT ST_Segmentize((ST_Dump(ST_Intersection(ST_MakeEnvelope(_west, _south, _east, _north, 28992),geom))).geom,_segmentlength) geom
+		FROM noisemodel.demo_area
 ),
 
 mainroads AS (
 	SELECT a.ogc_fid, 'road'::text AS class, a.bgt_functie as type, ST_Intersection(a.wkb_geometry,c.geom) geom 
 	FROM bgt.wegdeel_2dactueelbestaand a
 	LEFT JOIN bgt.overbruggingsdeel_2dactueelbestaand b
-	ON (St_Intersects((a.wkb_geometry), (b.wkb_geometry)) AND St_Contains(ST_buffer((b.wkb_geometry),1), (a.wkb_geometry)))
+	ON (St_Intersects((a.wkb_geometry), (b.wkb_geometry)) 
+	--this contains is super expensive since it doens't use the query
+	--AND St_Contains(ST_buffer((b.wkb_geometry),1), (a.wkb_geometry))
+	)
 	,bounds c
 	WHERE a.relatieveHoogteligging = 0
 	AND ST_CurveToLine(b.wkb_geometry) Is Null

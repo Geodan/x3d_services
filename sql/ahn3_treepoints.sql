@@ -1,13 +1,15 @@
-WITH 
+WITH
 bounds AS (
-	SELECT ST_MakeEnvelope(_west, _south, _east, _north, 28992) geom
+	SELECT ST_Segmentize((ST_Dump(ST_Intersection(ST_MakeEnvelope(_west, _south, _east, _north, 28992),geom))).geom,_segmentlength) geom
+		FROM noisemodel.demo_area
 ),
+
 pointcloud_unclassified AS(
 	SELECT 
 		PC_FilterEquals(pa,'classification',1)
 	 pa  
 	FROM ahn3_pointcloud.vw_ahn3, bounds 
-	WHERE ST_DWithin(geom, PC_Envelope(pa),10) --patches should be INSIDE bounds
+	WHERE PC_Intersects(geom, pa) --patches should be INSIDE bounds
 ),
 patches AS (
 	SELECT a.pa FROM pointcloud_unclassified a

@@ -3,14 +3,15 @@ bounds AS (
 	SELECT ST_Segmentize(ST_MakeEnvelope(_west, _south, _east, _north, 28992),_segmentlength) geom
 )
 ,buildings AS (
-	SELECT gebwbagid,height, (ST_DumpRings(a.geom)).geom
-	FROM noisemodel.boxes_polygonizedz_distelbuurt a, bounds b
+	SELECT blockid,height, (ST_DumpRings(a.geom)).geom
+	FROM noisemodel.planesz a, bounds b, noisemodel.demo_area c
 	WHERE ST_Intersects(a.geom, b.geom)
+	AND ST_Contains(c.geom, a.geom)
 	AND ST_GeometryType(a.geom) = 'ST_Polygon'
 )
 
 
-SELECT _south::text || _west::text || p.gebwbagid AS id, 
+SELECT _south::text || _west::text || p.blockid AS id, 
 'building' As type,
 'building' As class,
 'red' as color,

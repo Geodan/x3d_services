@@ -1,7 +1,9 @@
 
 WITH
 bounds AS (
-	SELECT ST_Segmentize(ST_MakeEnvelope(_west, _south, _east, _north, 28992),_segmentlength) geom
+	SELECT 
+		(ST_Dump(ST_Intersection(ST_Segmentize(ST_MakeEnvelope(_west, _south, _east, _north, 28992),_segmentlength),geom))).geom geom
+		FROM noisemodel.demo_area
 ),
 pointcloud_ground AS (
 	SELECT PC_FilterEquals(pa,'classification',2) pa 

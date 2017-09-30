@@ -1,6 +1,7 @@
 WITH 
 bounds AS (
-	SELECT ST_Segmentize(ST_MakeEnvelope(_west, _south, _east, _north, 28992),_segmentlength) geom
+	SELECT ST_Segmentize((ST_Dump(ST_Intersection(ST_MakeEnvelope(_west, _south, _east, _north, 28992),geom))).geom,_segmentlength) geom
+		FROM noisemodel.demo_area
 ),
 pointcloud_water AS (
 	SELECT PC_FilterEquals(pa,'classification',9) pa 
@@ -9,12 +10,16 @@ pointcloud_water AS (
 ),
 polygons AS (
 	SELECT nextval('counter') id, bgt_type as type, 'water'::text AS class,
-	  (ST_Dump(ST_Union(
-		 a.wkb_geometry -- doing intersection later so we can find better average height
-	  ))).geom
+	  (ST_Dump(
+		  ST_Intersection(
+		  	ST_Union(
+		 		a.wkb_geometry -- doing intersection later so we can find better average height
+	  		)
+			,b.geom)
+	  )).geom
 	FROM bgt.waterdeel_2dactueelbestaand a, bounds b
 	WHERE ST_Intersects(a.wkb_geometry, b.geom)
-	GROUP BY bgt_type
+	GROUP BY bgt_type,b.geom
 )
 ,polygonsz AS ( 
 	SELECT a.id, a.type, a.class, 

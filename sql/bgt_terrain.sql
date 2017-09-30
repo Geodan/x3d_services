@@ -1,7 +1,8 @@
 
 WITH
 bounds AS (
-	SELECT ST_Segmentize(ST_MakeEnvelope(_west, _south, _east, _north, 28992),_segmentlength) geom
+	SELECT ST_Segmentize((ST_Dump(ST_Intersection(ST_MakeEnvelope(_west, _south, _east, _north, 28992),geom))).geom,_segmentlength) geom
+		FROM noisemodel.demo_area
 ),
 plantcover AS (
 	SELECT ogc_fid, 'plantcover'::text AS class, bgt_fysiekvoorkomen as type, St_Intersection(wkb_geometry, geom) geom 
@@ -12,6 +13,11 @@ bare AS (
 	SELECT ogc_fid, 'bare'::text AS class, bgt_fysiekVoorkomen as type, St_Intersection(wkb_geometry, geom) geom
 	FROM bgt.onbegroeidterreindeel_2dactueelbestaand, bounds
 	WHERE ST_Intersects(geom, wkb_geometry) AND ST_GeometryType(wkb_geometry) = 'ST_Polygon'
+),
+build AS (
+	SELECT ogc_fid, 'build'::text AS class, 'pand'::text as type, St_Intersection(wkb_geometry, geom) geom
+	FROM bgt.pand_2dactueelbestaand, bounds
+	WHERE ST_Intersects(geom, wkb_geometry)
 ),
 pointcloud_ground AS (
 	SELECT PC_FilterEquals(pa,'classification',2) pa 
@@ -24,6 +30,9 @@ polygons AS (
 	UNION ALL
 	SELECT nextval('counter') id, ogc_fid fid, COALESCE(type,'transitie') as type, class,(ST_Dump(geom)).geom
 	FROM bare
+	UNION ALL
+	SELECT nextval('counter') id, ogc_fid fid, COALESCE(type,'transitie') as type, class,(ST_Dump(geom)).geom
+	FROM build
 )
 ,polygonsz AS (
 	SELECT id, fid, type, class, patch_to_geom(PC_Union(b.pa), geom) geom
