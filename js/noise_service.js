@@ -15,7 +15,7 @@ var sets = {
 	roads: { file : '../sql/bgt_road.sql',sql: ''},
 	treepoints: { file : '../sql/ahn3_treepoints.sql', sql : '' },
 	buildingpoints: { file : '../sql/ahn3_buildingpoints.sql', sql : '' },
-	buildings: { file : '../sql/bgt_buildings.sql', sql : '' },
+	buildings: { file : '../sql/noise_buildingsLOD1.sql', sql : '' },
 	kade: { file: '../sql/bgt_kade.sql',sql: ''}
 }; 
 for( var s in sets ) { 
