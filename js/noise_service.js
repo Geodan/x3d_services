@@ -7,6 +7,7 @@ var fs = require( 'fs' );
 var pg = require( 'pg' ); 
 var sets = {
 	roofplanes: { file: '../sql/noise_roofplanes.sql',sql: ''},
+	buildingslod1plus: { file: '../sql/noise_buildingslod1plus.sql',sql: ''},
 	roofoutline: { file: '../sql/noise_roofoutline.sql',sql: ''},
 	buildup: { file : '../sql/noise_buildup.sql',sql: ''},
 	water: { file: '../sql/bgt_water.sql',sql: ''},
