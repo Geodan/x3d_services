@@ -1,8 +1,9 @@
 WITH
 bounds AS (
-	SELECT geom
+	SELECT ST_MakeEnvelope(_west, _south, _east, _north, 28992) geom
+	--geom
 	--ST_Segmentize((ST_Dump(ST_Intersection(ST_MakeEnvelope(_west, _south, _east, _north, 28992),geom))).geom,_segmentlength) geom
-		FROM noisemodel.demo_area
+	--	FROM noisemodel.demo_area
 )
 ,breaklines AS (
 	SELECT 

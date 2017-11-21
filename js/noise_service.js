@@ -10,6 +10,7 @@ var sets = {
 	buildingslod1plus: { file: '../sql/noise_buildingslod1plus.sql',sql: ''},
 	roofoutline: { file: '../sql/noise_roofoutline.sql',sql: ''},
 	buildup: { file : '../sql/noise_buildup.sql',sql: ''},
+	breaklines: { file: '../sql/noise_breaklines.sql',sql: ''},
 	water: { file: '../sql/bgt_water.sql',sql: ''},
 	terrain: { file : '../sql/bgt_terrain.sql',sql: ''},
 	roads: { file : '../sql/bgt_road.sql',sql: ''},

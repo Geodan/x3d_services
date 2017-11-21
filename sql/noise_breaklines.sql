@@ -6,14 +6,17 @@ breaklines AS (
 	SELECT nextval('counter') id, 
 		type AS type, 
 		 --ST_ExteriorRing((ST_DumpRings(a.wkb_geometry)).geom) as geom
-		 a.wkb_geometry as geom
-	FROM noisecontours.breaklines_chopped a, bounds b
+		 --(ST_Dump(ST_Triangulate2dz(ST_Union(
+		 ST_Intersection(a.wkb_geometry,b.geom) 
+		 --)))).geom
+		 as geom
+	FROM noisemodel.breaklines_chopped a, bounds b
 	WHERE ST_Intersects(a.wkb_geometry, b.geom)
 )
 
 SELECT _south::text || _west::text || p.id AS id, 
-type,
-CASE type
+type as type,
+CASE 'type'
 	WHEN 'water' THEN 'blue'
 	WHEN 'breakline' THEN 'green'
 	WHEN 'kade' THEN 'grey'
