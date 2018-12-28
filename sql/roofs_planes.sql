@@ -7,7 +7,7 @@ bounds AS (
 	--FROM noisemodel.planesz a, bounds b, noisemodel.demo_area c
 	FROM tmp.tmp5 a, bounds b
 	WHERE 1=1
-	AND ST_Intersects(a.geom, b.geom)
+	ST_Intersects(a.geom, b.geom)
 	--AND ST_Contains(c.geom, a.geom)
 	AND ST_GeometryType(a.geom) = 'ST_Polygon'
 )

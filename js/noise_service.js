@@ -47,7 +47,7 @@ app.get( '/noisemodel3d', function( req, res ) {
 					password : 'xxxxxxx', 
 					database : 'research', 
 					host : 'metis', 
-					port : 5433 
+					port : 5432 
 			} ); 
 			
 			var querystring = fs.readFileSync( sets [ set ].file ).toString( );
